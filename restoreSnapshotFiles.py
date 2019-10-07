@@ -9,7 +9,7 @@ Recursively retrieve deleted files by looping through each directory's .snapshot
 
 Note: This cannot be done from a local Python/Spyder environment because .snapshot will not be visible
 
-Step 1) You must ssh into the system with the command: ssh 'username'@apps.pni.princeton.edu
+Step 1) You must ssh into the system with the command: ssh <username>@apps.pni.princeton.edu
 Step 2) Open a Python environment with the command: python
 Step 3) Copy/paste the below code into the environment and execute. Check on the size of the directory to make sure it's increasing.
 
