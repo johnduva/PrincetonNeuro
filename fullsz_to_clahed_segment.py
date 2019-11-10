@@ -24,10 +24,11 @@ import skimage.exposure as skie
 from skimage.filters import threshold_otsu, threshold_adaptive
 from skimage import img_as_bool
 from tools.analysis.analyze_injection import optimize_inj_detect, pool_injections_for_analysis
-%matplotlib inline
+%matplotlib auto
 
 
-#%% Step 1:  Combine all indivual fullsize image planes into a single TIFF file (w/ option to save this step)
+#%% 
+'''Step 1:  Combine all indivual fullsize image planes into a single TIFF file (w/ option to save this step)'''
 
 # Set Input Parameters:
 # input path
@@ -68,126 +69,111 @@ for directory in sorted(os.listdir(parent_dir)):
     print("Saving " + an + " to " + output)
     print()
 
-#%% Step 2: Rotate to coronal view, crop out negative space, and apply CLAHE/rescaling filters to each plane 
+#%% 
+    '''Step 2: Rotate to coronal view, crop out negative space, and apply CLAHE/rescaling filters to each plane    ''' 
+
+    img = tiff.imread('/home/wanglab/mounts/LightSheetTransfer/Jess/processed/an12_eaat4_4x/an12_eaat4_031919_cb_4x_488_647_049na_1hfds_z5um_50msec_20povlp_resized_ch01.tif')
+    img.shape
+    plt.imshow(img[200])
     
-    img = tiff.imread('/home/wanglab/mounts/wang/jduva/ALL DESKTOP/fullSized_to_segmented/fullsz_noCLAHE/an09')
-    
-    cb_coronal = np.transpose(img, [1,0,2]) # rotate to coronal view
-    cropped = cb_coronal[:, 100:, 300:1850] #crop out negative space
-#    plt.imshow(cropped[1700]*7)
+    cb_coronal = np.rot90(np.transpose(img, [1,0,2]), axes = (2,1)) # rotate to coronal view
+#    cropped = cb_coronal[:, 100:, 300:1850] #crop out negative space
+    plt.imshow(cb_coronal[50]*7)
    
+    cropped=cb_coronal
+    
     #create CLAHE function (to be applied to images in Step 2)
     claheFunc = cv2.createCLAHE(clipLimit=2, tileGridSize=(32,32)) 
     # create an array of zeros of the same size as the 3D cerebellum which we will fill with the 2D filtered planes
     final_array = np.zeros(cropped.shape)     
     # apply the filter in a loop over the first axis
-    for i in range(1640,2300):#range(final_array.shape[0]): #for all the z planes in (z,y,x):
+    for i in range(img.shape[0]):#range(final_array.shape[0]): #for all the z planes in (z,y,x):
         clahedImage_i = claheFunc.apply(cropped[i].astype('uint16'))
-        rescaled = skie.rescale_intensity(clahedImage_i, in_range=(1, 25000), out_range=(0, 35000))
-        final_array[i] = clahedImage_i
-#        if i%20 ==0 : print(str(i) + " out of: " + str(len(final_array)))
-#    plt.imshow(final_array[1800]*10)
-    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/clahe632_rescale_25_35.tif', final_array[1640:2300])
+        two_clahedImage_i = claheFunc.apply(clahedImage_i)
+        final_array[i] = two_clahedImage_i
+        if i%10 ==0 : print(str(i) + " out of: " + str(len(final_array)))
+    
+    plt.imshow(final_array[200])
+    plt.imshow(final_array[200]*final_array[200]*final_array[200]*final_array[200])
+    final_array = final_array*final_array*final_array*final_array
+    
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2Xclahe32_4xOBJ.tif', final_array)
     
     
-    #%% Step 3: 
-    img = tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/clahe32_rescale_25_35.tif')
-    plt.imshow(img[300], cmap='bone')
+#%% 
+    %matplotlib inline
     
-    
-    
-    down = tiff.imread('/home/wanglab/mounts/wang/pisano/tracing_output/eaat4/an03_eaat4_031919/elastix/an3_eaat4_031919_1d3x_647_017na_1hfds_z10um_150msec_resized_ch00/result.tif')
-    plt.imshow(down[])    
-    # if a pixel value is greater than a threshold, it is assigned a value (1/white), if not - it is assigned another value (0/black)
-    img = tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/clahe32_rescale_25_35.tif')
-    img.shape
-    plt.imshow(img[325])
+'''Step 3: Binarize planes into zebrin positive/negative pixels
+- If a pixel value is greater than a threshold, it is assigned a value of positive (1/white). If not, it is assigned a negative value (0/black).
+- Positive values outside of the brain are okay since they will be ignored during registration'''
 
-    block_size = 1001
-    array = np.zeros(img.shape)
+    img = final_array[90:445]
+#    img= tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2Xclahe32_4xOBJ.tif)
+    plt.imshow(img[200])
+
+
+    array = np.zeros(img.shape)    
+    normalizedImg = np.zeros((img.shape[1], img.shape[2]))
     for i, plane in enumerate(range(img.shape[0])):
+        # normalize each plane
+        normalizedImg = cv2.normalize(img[i],  normalizedImg, 0, 255, cv2.NORM_MINMAX)      
+        # threshold each plane (src, threshVal, maxVal, thresh_type)
+        ret,thresh1 = cv2.threshold(normalizedImg, 90, 255, cv2.THRESH_BINARY)
+        array[i] = thresh1
+        if i%40== 0:
+            print('Plane ' + str(i) + " of " + str(img.shape[0]))
+            plt.imshow(thresh1,cmap='gray')
+            plt.show()
+            
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2xclahe_4xOBJ_normalized_cv2Thresh90.tif', array)
+ 
+    # rotate back to saggital orientation
+    cb_sag = np.transpose(array, [2,0,1])
+    plt.imshow(cb_sag[300])
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/segmented_saggital_4ximmult_2xclahe_4xOBJ.tif', cb_sag)
+
+    
+#%%
+    %matplotlib auto
+    
+'''Step 3: Binarize planes into zebrin positive/negative pixels
+- If a pixel value is greater than a threshold, it is assigned a value of positive (1/white). If not, it is assigned a negative value (0/black).
+- Positive values outside of the brain are okay since they will be ignored during registration'''
+
+    img = final_array[85:475]
+#    img= tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2Xclahe32_4xOBJ.tif)
+    plt.imshow(img[200])
+
+
+    array = np.zeros(img.shape)    
+    normalizedImg = np.zeros((img.shape[1], img.shape[2]))
+    for i, plane in enumerate(range(img.shape[0])):
+        # normalize each plane
+        normalizedImg = cv.normalize(img[i],  normalizedImg, 0, 255, cv.NORM_MINMAX)
+        
+        # threshold each plane (src, threshVal, maxVal, thresh_type)
+        ret,thresh1 = cv.threshold(normalizedImg, 100, 255, cv.THRESH_BINARY)
+
         binary_adaptive = threshold_adaptive(img[i], block_size, offset=10)
         array[i] = binary_adaptive
-        print(i)
-        plt.imshow(binary_adaptive)
-        plt.show()
-
-    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/thresh_adapt.tif', array)
+        print(str(i) + " out of: " + str(img.shape[0]))
+       
+        if i%10== 0:
+            plt.imshow(binary_adaptive)
+            plt.show()
+    
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2xclahe_4xOBJ_thresh_adapt.tif', array)
  
+    # rotate back to saggital orientation
+    cb_sag = np.transpose(array, [2,0,1])
+    plt.imshow(cb_sag[300])
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/segmented_saggital_4ximmult_2xclahe_4xOBJ.tif', cb_sag)
+    
 
-        
-#        blurred = cv2.GaussianBlur(img[i],(0,0),cv2.BORDER_DEFAULT )
-#        
-#
-#        plt.imshow(blurred)
-#        if i==0: break
-#        th3 = cv2.adaptiveThreshold(blurred.astype('uint8'),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-#
-#        plt.imshow(th3)
-##        plt.imshow(blurred)
-#
-#        if i==0: break
-#    
-    
-    single = img[200]
-   
-    
-    
-    # Function to test detection parameters
-    optimize_inj_detect(img, threshold=2.75, filter_kernel=(3,3,3), dst='/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/opt_inj_det/2d75_333.tif')
-    
-    
-    kwargs = {'inputlist': inputlist, 
-              'filter_kernel': (3,3),
-              'threshold': .6,
-              'num_sites_to_keep': 1,
-              'injectionscale': 45000, 
-              'imagescale': 2,
-              'dst': '/home/wanglab/Desktop/testing',
-              'save_individual': True, 
-              'colormap': 'bone', 
-              'crop': False,
-              'atlas': "/home/wanglab/mounts/LightSheetTransfer/atlas/sagittal_atlas_20um_iso.tif",
-              'annotation':"/home/wanglab/mounts/LightSheetTransfer/atlas/annotation_sagittal_atlas_20um_iso.tif",
-              'id_table': "/home/wanglab/mounts/LightSheetTransfer/atlas/ls_id_table_w_voxelcounts.xlsx"
-            }              
-              
-    df = pool_injections_for_analysis(**kwargs)
-    
-    #1640:2300
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
     
     
     IM_MAX = np.max(final_array[1800:], axis=0)
     plt.imsave('/jukebox/wang/jduva/ALL DESKTOP/fullSized_to_segmented/fullsz_noCLAHE/resclaedClAHEd', IM_MAX)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-#    
-#    #check the shape of the output files
-#    for directory in sorted(os.listdir(output)): 
-#    an = directory[0:4]
-#    print(an)
-#    
-#    
     
