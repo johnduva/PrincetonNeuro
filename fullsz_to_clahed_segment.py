@@ -10,7 +10,8 @@ Combine each sample's raw data (lightsheet) into a singular binaraized file for 
 Steps:
 1) Combine all indivual fullsize image planes into a single TIFF file (w/ option to save this step)
 
-2) 
+2) Rotate to coronal view, crop out negative space, and apply CLAHE/rescaling filters to each plane 
+    
 
 
 """
@@ -20,8 +21,10 @@ import numpy as np
 import tifffile as tiff
 import matplotlib.pyplot as plt
 import skimage.exposure as skie
+from skimage.filters import threshold_otsu, threshold_adaptive
+from skimage import img_as_bool
 from tools.analysis.analyze_injection import optimize_inj_detect, pool_injections_for_analysis
-%matplotlib auto
+%matplotlib inline
 
 
 #%% Step 1:  Combine all indivual fullsize image planes into a single TIFF file (w/ option to save this step)
@@ -89,11 +92,49 @@ for directory in sorted(os.listdir(parent_dir)):
     
     #%% Step 3: 
     img = tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/clahe32_rescale_25_35.tif')
-    print(img.shape)
-    plt.imshow(img)
+    plt.imshow(img[300], cmap='bone')
+    
+    
+    
+    down = tiff.imread('/home/wanglab/mounts/wang/pisano/tracing_output/eaat4/an03_eaat4_031919/elastix/an3_eaat4_031919_1d3x_647_017na_1hfds_z10um_150msec_resized_ch00/result.tif')
+    plt.imshow(down[])    
+    # if a pixel value is greater than a threshold, it is assigned a value (1/white), if not - it is assigned another value (0/black)
+    img = tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/clahe32_rescale_25_35.tif')
+    img.shape
+    plt.imshow(img[325])
+
+    block_size = 1001
+    array = np.zeros(img.shape)
+    for i, plane in enumerate(range(img.shape[0])):
+        binary_adaptive = threshold_adaptive(img[i], block_size, offset=10)
+        array[i] = binary_adaptive
+        print(i)
+        plt.imshow(binary_adaptive)
+        plt.show()
+
+    tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/thresh_adapt.tif', array)
+ 
+
+        
+#        blurred = cv2.GaussianBlur(img[i],(0,0),cv2.BORDER_DEFAULT )
+#        
+#
+#        plt.imshow(blurred)
+#        if i==0: break
+#        th3 = cv2.adaptiveThreshold(blurred.astype('uint8'),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+#
+#        plt.imshow(th3)
+##        plt.imshow(blurred)
+#
+#        if i==0: break
+#    
+    
+    single = img[200]
+   
+    
     
     # Function to test detection parameters
-    optimize_inj_detect(img, threshold=2.5, filter_kernel=(3,3,3), dst='/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/opt_inj_det/2d5_333.tif')
+    optimize_inj_detect(img, threshold=2.75, filter_kernel=(3,3,3), dst='/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/opt_inj_det/2d75_333.tif')
     
     
     kwargs = {'inputlist': inputlist, 
