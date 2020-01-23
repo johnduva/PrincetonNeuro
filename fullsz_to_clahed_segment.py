@@ -12,7 +12,7 @@ Steps:
 
 2) Rotate to coronal view, crop out negative space, and apply CLAHE/rescaling filters to each plane 
     
-
+3) Binarize planes into zebrin positive/negative pixels with a thresholding algorithm
 
 """
 
@@ -127,7 +127,7 @@ for directory in sorted(os.listdir(parent_dir)):
             
     tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2xclahe_4xOBJ_normalized_cv2Thresh90.tif', array)
  
-    # rotate back to saggital orientation
+    # rotate back to saggital orientation depending on needs
     cb_sag = np.transpose(array, [2,0,1])
     plt.imshow(cb_sag[300])
     tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/segmented_saggital_4ximmult_2xclahe_4xOBJ.tif', cb_sag)
@@ -140,10 +140,8 @@ for directory in sorted(os.listdir(parent_dir)):
 - If a pixel value is greater than a threshold, it is assigned a value of positive (1/white). If not, it is assigned a negative value (0/black).
 - Positive values outside of the brain are okay since they will be ignored during registration'''
 
-    img = final_array[85:475]
-#    img= tiff.imread('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/4ximmult_2Xclahe32_4xOBJ.tif)
+    img = array[85:475]
     plt.imshow(img[200])
-
 
     array = np.zeros(img.shape)    
     normalizedImg = np.zeros((img.shape[1], img.shape[2]))
@@ -170,10 +168,7 @@ for directory in sorted(os.listdir(parent_dir)):
     tiff.imsave('/jukebox/wang/jduva/fullSized_to_segmented/fullsz_CLAHE/segmented_saggital_4ximmult_2xclahe_4xOBJ.tif', cb_sag)
     
 
-
-
-    
-    
-    IM_MAX = np.max(final_array[1800:], axis=0)
-    plt.imsave('/jukebox/wang/jduva/ALL DESKTOP/fullSized_to_segmented/fullsz_noCLAHE/resclaedClAHEd', IM_MAX)
+    # max projection function for visualization purposes when necessary
+    #IM_MAX = np.max(cb_sag[:], axis=0)
+    #plt.imsave('/jukebox/wang/jduva/ALL DESKTOP/fullSized_to_segmented/fullsz_noCLAHE/resclaedClAHEd', IM_MAX)
     
