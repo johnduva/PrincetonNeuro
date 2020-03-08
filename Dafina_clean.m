@@ -1,3 +1,11 @@
+# Correct Dafina's labels
+
+# 1) Import skeleton ('body_part_labels.mat'), frame indicies, and incorrect .trk (labels) file.
+# 2) Find every coordinate that is not a NaN, and then get its index by seeing where it intersects with 'frame_idx.'
+# 3) Walk through each x/y coorindate with nested loops and set coordinate to NaN if frame is not on our 'intersect' list.
+# 4) Update our pTrk variable to prepare for saving out to new .trk file.
+# 5) Clear out everything that shouldn't be in our .trk file - and then save it.
+
 clc; clear;
 disp('Running...');
 load('body_part_labels.mat')
