@@ -1,3 +1,10 @@
+# Convert labels from 'Body Part Labeler' software into 'Animal Part Tracker' format.
+
+# 1) Import incorrect .trk (labels) file from BPL, as well as a .mat file which provides a skeleton for the proper formatting.
+# 2) Create three different loops to cycle through each bodyPart, frame, and x/y coordinate.
+# 3) Each iteration will set either an x or y coordinate into the proper format.
+# 4) Make sure that we only leave the variables that we want to save into the new trk file - then save it. 
+
 clc; clear;
 disp("Running...")
 load('movie_observational_learning_labels.trk', '-mat');
