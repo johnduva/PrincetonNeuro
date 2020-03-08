@@ -8,6 +8,11 @@
 #SBATCH --gres=gpu:1
 #SBATCH --output='/tigress/jduva/logs/track.%j.log'
 
+# This is the main script for processing videos via sLEAP.
+# It is imperative that this is submitted in shell form to be sent off to a compute node - as a 95,000 frame video typically takes ~3 hours to run.
+# The name of the video.dataset may be different for you. I checked mine by importing .h5 file into MATLAB.
+# Your centroids and conf maps models might differ from the ones listed here, so be sure to name them appropriately.
+
 VIDEO_PATH="$1"
 
 module load anaconda
