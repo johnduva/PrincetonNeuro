@@ -17,6 +17,7 @@
 # or via loop: for video in OFT*; do python -m sleap.info.trackcleaner $video; done;
 
 VIDEO_PATH="$1"
+NUM_ANIMALS="$2"
 
 module load anaconda
 module load cudnn/cuda-10.1/7.5.0
@@ -25,6 +26,5 @@ conda activate /home/jduva/.conda/envs/sleap_env2
 
 export HDF5_PLUGIN_PATH=/tigress/jduva/HDF5/plugins
 
-numAnimals = 1
-python -m sleap.info.trackcleaner "$VIDEO_PATH" -c numAnimals
+python -m sleap.info.trackcleaner "$VIDEO_PATH" -c "$NUM_ANIMALS"
 
