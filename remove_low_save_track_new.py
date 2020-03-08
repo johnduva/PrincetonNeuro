@@ -1,10 +1,12 @@
+# This script automatically deletes predictions with scores below 10%.
+# It also names each track after the uploaded file, but may need to be altered based on circumstances (lines 36-37).
+
 from sleap import Labels
 import sys
 
 SCORE_THRESHOLD = .1
 
 filename = sys.argv[1]
-print('Filename is: ' + str(filename))
 out_filename = str(filename)+'_highscores_trackName.h5'
 
 labels = Labels.load_file(filename)

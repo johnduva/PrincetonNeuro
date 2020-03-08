@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 24 13:07:12 2019
-
 @author: John D'Uva (Wang Lab, Princeton University)
 
 Recursively retrieve deleted files by looping through each directory's .snapshot from a desired date/time.
-
 Note: This cannot be done from a local Python/Spyder environment because .snapshot will not be visible
 
 Step 1) You must ssh into the system with the command: ssh <username>@apps.pni.princeton.edu
@@ -65,4 +63,3 @@ for dirPath in dirPaths:
         finally:
             num_files+=1
             print(num_files)
-            

@@ -2,18 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 17 10:27:08 2019
-
 @author: John D'Uva (Wang Lab, Princeton University)
 
 A list of short, helpful subroutines for image processing.
 ---------------------------------------------------------
-
 1) Desktop notification upon script completion
-
 2) Convert TIFF file to JPEG (or other)
-
 3) Crop sagittal lightsheet image and rotate to coronal view
-
 """
 
 #%% Send notification to Desktop when code is complete
