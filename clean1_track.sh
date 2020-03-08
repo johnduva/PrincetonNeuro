@@ -13,7 +13,7 @@
 # Remember to update the paths below accordingly - and to set the proper number of animals.
 
 # To save time and karma, usage on the head node of TigerGPU usually won't get you in trouble.
-# Just run python -m sleap.info.trackcleaner <path> -c 1
+# Just run python -m sleap.info.trackcleaner <path> -c <numAnimals>
 # or via loop: for video in OFT*; do python -m sleap.info.trackcleaner $video; done;
 
 VIDEO_PATH="$1"
