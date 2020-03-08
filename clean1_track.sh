@@ -9,11 +9,12 @@
 #SBATCH --output='/tigress/jduva/logs/track.%j.log'
 
 # This script will typically be called within a bash loop such as:
-# for video in OFT*; do python clean1_track.sh $video; done;
+# for video in OFT*; do sbatch clean1_track.sh $video; done;
 # Remember to update the paths below accordingly - and to set the proper number of animals.
 
-# To save time and karma, usage on the head node of TigerGPU will usually not get you in trouble.
+# To save time and karma, usage on the head node of TigerGPU usually won't get you in trouble.
 # Just run python -m sleap.info.trackcleaner <path> -c 1
+# or via loop: for video in OFT*; do python -m sleap.info.trackcleaner $video; done;
 
 VIDEO_PATH="$1"
 
