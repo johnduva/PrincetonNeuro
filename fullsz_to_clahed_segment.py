@@ -2,16 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep  5 16:11:03 2019
-
 @author: John D'Uva (Wang Lab, Prineton University)
 
 Combine each sample's raw data (lightsheet) into a singular binaraized file for pos/neg zebrin banding comparison.
 
 Steps:
 1) Combine all indivual fullsize image planes into a single TIFF file (w/ option to save this step)
-
 2) Rotate to coronal view, crop out negative space, and apply CLAHE/rescaling filters to each plane 
-    
 3) Binarize planes into zebrin positive/negative pixels with a thresholding algorithm
 
 """
