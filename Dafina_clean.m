@@ -7,7 +7,6 @@
 # 5) Clear out everything that shouldn't be in our .trk file - and then save it.
 
 clc; clear;
-disp('Running...');
 load('body_part_labels.mat')
 load('frame_idx.mat')
 load('movie_observational_learning_labels.trk', '-mat');
@@ -35,4 +34,4 @@ clear bodyPart; clear bp_labels; clear fields; clear frame;
 clear frame_idx; clear intersect; clear j; clear labeled; clear test;
 save('duva_track.trk');
 
-disp("Finished running.");
+disp("Finished.");
