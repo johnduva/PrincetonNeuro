@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep  5 16:11:03 2019
-@author: John D'Uva (Wang Lab, Prineton University)
+@author: John D'Uva (Wang Lab, Princeton University)
 
 Combine each sample's raw data (lightsheet) into a singular binaraized file for pos/neg zebrin banding comparison.
 
